@@ -1,0 +1,399 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.wrap { padding: 1rem; font-family: var(--font-sans, sans-serif); }
+.tab-row { display: flex; gap: 0; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 16px; }
+.tab { padding: 8px 14px; font-size: 13px; cursor: pointer; color: var(--color-text-secondary); border-bottom: 2px solid transparent; margin-bottom: -0.5px; transition: all 0.15s; }
+.tab.active { color: var(--color-text-primary); border-bottom-color: var(--color-text-primary); font-weight: 500; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+.phase-row { display: flex; gap: 0; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; }
+.phase { flex: 1; min-width: 100px; border: 0.5px solid; border-radius: 0; padding: 10px 8px 8px; cursor: pointer; transition: all 0.15s; text-align: center; border-right: none; }
+.phase:first-child { border-radius: 8px 0 0 8px; }
+.phase:last-child { border-radius: 0 8px 8px 0; border-right: 0.5px solid; }
+.phase .ph-num { font-size: 10px; margin-bottom: 3px; opacity: 0.65; }
+.phase .ph-name { font-size: 12px; font-weight: 500; line-height: 1.3; }
+.phase .ph-sub { font-size: 10px; margin-top: 3px; opacity: 0.7; line-height: 1.3; }
+
+.phase.p0 { background: #F1EFE8; border-color: #B4B2A9; color: #444441; }
+.phase.p1 { background: #E6F1FB; border-color: #85B7EB; color: #0C447C; }
+.phase.p2 { background: #EEEDFE; border-color: #AFA9EC; color: #3C3489; }
+.phase.p3 { background: #FAEEDA; border-color: #EF9F27; color: #633806; }
+.phase.p4 { background: #E1F5EE; border-color: #5DCAA5; color: #085041; }
+.phase.p5 { background: #EAF3DE; border-color: #97C459; color: #27500A; }
+.phase.p6 { background: #FAECE7; border-color: #F0997B; color: #712B13; }
+
+.phase.active.p0 { background: #5F5E5A; color: #fff; border-color: #5F5E5A; }
+.phase.active.p1 { background: #185FA5; color: #fff; border-color: #185FA5; }
+.phase.active.p2 { background: #534AB7; color: #fff; border-color: #534AB7; }
+.phase.active.p3 { background: #BA7517; color: #fff; border-color: #BA7517; }
+.phase.active.p4 { background: #0F6E56; color: #fff; border-color: #0F6E56; }
+.phase.active.p5 { background: #3B6D11; color: #fff; border-color: #3B6D11; }
+.phase.active.p6 { background: #993C1D; color: #fff; border-color: #993C1D; }
+
+.detail-box { border: 0.5px solid var(--color-border-secondary); border-radius: 10px; padding: 14px 16px; background: var(--color-background-secondary); min-height: 80px; }
+.detail-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 8px; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.detail-cell { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: 8px; padding: 8px 10px; }
+.cell-label { font-size: 10px; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.cell-content { font-size: 12px; color: var(--color-text-primary); line-height: 1.5; }
+.pill { display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 10px; margin: 2px 2px 2px 0; border: 0.5px solid; }
+.pill-blue { background: #E6F1FB; border-color: #85B7EB; color: #0C447C; }
+.pill-purple { background: #EEEDFE; border-color: #AFA9EC; color: #3C3489; }
+.pill-amber { background: #FAEEDA; border-color: #EF9F27; color: #633806; }
+.pill-teal { background: #E1F5EE; border-color: #5DCAA5; color: #085041; }
+.pill-green { background: #EAF3DE; border-color: #97C459; color: #27500A; }
+.pill-coral { background: #FAECE7; border-color: #F0997B; color: #712B13; }
+.pill-gray { background: #F1EFE8; border-color: #B4B2A9; color: #444441; }
+.pill-red { background: #FCEBEB; border-color: #F09595; color: #791F1F; }
+
+.warn { font-size: 11px; color: var(--color-text-warning); background: var(--color-background-warning); border: 0.5px solid var(--color-border-warning); border-radius: 6px; padding: 4px 8px; margin-top: 6px; display: inline-block; }
+
+.dim-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; align-items: flex-start; }
+.dim-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); width: 130px; flex-shrink: 0; padding-top: 4px; }
+.dim-tags { display: flex; gap: 5px; flex-wrap: wrap; flex: 1; }
+.tag { font-size: 11px; padding: 3px 8px; border-radius: 20px; border: 0.5px solid; cursor: pointer; transition: all 0.15s; user-select: none; }
+.tag-lc { background: #E6F1FB; border-color: #85B7EB; color: #0C447C; }
+.tag-access { background: #E1F5EE; border-color: #5DCAA5; color: #085041; }
+.tag-auth { background: #EAF3DE; border-color: #97C459; color: #27500A; }
+.tag-entity { background: #EEEDFE; border-color: #AFA9EC; color: #3C3489; }
+.tag-contract { background: #FAEEDA; border-color: #EF9F27; color: #633806; }
+.tag-product { background: #FAECE7; border-color: #F0997B; color: #712B13; }
+.tag-other { background: #F1EFE8; border-color: #B4B2A9; color: #444441; }
+.tag.selected { font-weight: 500; filter: brightness(0.75); }
+.section-lbl { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: var(--color-text-tertiary); margin: 14px 0 8px; }
+.result-box { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: 8px; padding: 10px 12px; margin-top: 12px; font-size: 12px; color: var(--color-text-primary); line-height: 1.7; }
+</style>
+
+<div class="wrap">
+  <h2 class="sr-only">Framework segmentacji Trans.eu — wymiary, cykl życia i konfiguracja segmentów</h2>
+
+  <div class="tab-row">
+    <div class="tab active" onclick="switchTab('lifecycle')">Cykl życia</div>
+    <div class="tab" onclick="switchTab('dims')">Wymiary segmentacji</div>
+    <div class="tab" onclick="switchTab('builder')">Konfiguracja segmentu</div>
+  </div>
+
+  <div class="panel active" id="tab-lifecycle">
+    <div class="phase-row" id="phases">
+      <div class="phase p0 active" onclick="selectPhase(0)" data-i="0">
+        <div class="ph-num">0</div>
+        <div class="ph-name">Przed rejestracją</div>
+        <div class="ph-sub">MQL / anonimowy</div>
+      </div>
+      <div class="phase p1" onclick="selectPhase(1)" data-i="1">
+        <div class="ph-num">1</div>
+        <div class="ph-name">Rejestracja</div>
+        <div class="ph-sub">do 1. logowania</div>
+      </div>
+      <div class="phase p2" onclick="selectPhase(2)" data-i="2">
+        <div class="ph-num">2</div>
+        <div class="ph-name">1. logowanie</div>
+        <div class="ph-sub">do zakupu</div>
+      </div>
+      <div class="phase p3" onclick="selectPhase(3)" data-i="3">
+        <div class="ph-num">3</div>
+        <div class="ph-name">Zakup / Trial</div>
+        <div class="ph-sub">do AHA momentu</div>
+      </div>
+      <div class="phase p4" onclick="selectPhase(4)" data-i="4">
+        <div class="ph-num">4</div>
+        <div class="ph-name">Aktywacja</div>
+        <div class="ph-sub">AHA → Adopcja</div>
+      </div>
+      <div class="phase p5" onclick="selectPhase(5)" data-i="5">
+        <div class="ph-num">5</div>
+        <div class="ph-name">Adopcja</div>
+        <div class="ph-sub">Retention & Renewal</div>
+      </div>
+      <div class="phase p6" onclick="selectPhase(6)" data-i="6">
+        <div class="ph-num">6</div>
+        <div class="ph-name">Churned</div>
+        <div class="ph-sub">Ex-abo / po-trial</div>
+      </div>
+    </div>
+
+    <div class="detail-box" id="phase-detail"></div>
+  </div>
+
+  <div class="panel" id="tab-dims">
+    <div class="section-lbl">Perspektywa podmiotu</div>
+    <div class="dim-row"><div class="dim-label">Podmiot</div><div class="dim-tags">
+      <span class="tag tag-entity">User (user_id)</span>
+      <span class="tag tag-entity">User uprawniony</span>
+      <span class="tag tag-entity">Company (company_id)</span>
+    </div></div>
+
+    <div class="section-lbl">Cykl życia (oś główna)</div>
+    <div class="dim-row"><div class="dim-label">Dostęp do giełdy</div><div class="dim-tags">
+      <span class="tag tag-lc">Aktywny klient</span>
+      <span class="tag tag-lc">Non sub</span>
+      <span class="tag tag-lc">Ex-abo</span>
+    </div></div>
+    <div class="dim-row"><div class="dim-label">Poziom dostępu</div><div class="dim-tags">
+      <span class="tag tag-access">Demo</span>
+      <span class="tag tag-access">Trial (pełny)</span>
+      <span class="tag tag-access">Subskrypcja płatna</span>
+      <span class="tag tag-access">Zablokowany</span>
+    </div></div>
+
+    <div class="section-lbl">Autoryzacja</div>
+    <div class="dim-row"><div class="dim-label">Status</div><div class="dim-tags">
+      <span class="tag tag-auth">Authorized</span>
+      <span class="tag tag-auth">Unauthorized</span>
+      <span class="tag tag-auth">Deauthorized</span>
+    </div></div>
+    <div class="dim-row"><div class="dim-label">Weryfikacja (no sub)</div><div class="dim-tags">
+      <span class="tag tag-auth">basicVerification</span>
+      <span class="tag tag-auth">extendedVerification</span>
+      <span class="tag tag-auth">identityVerification</span>
+      <span class="tag tag-auth">preIdentityVerification</span>
+    </div></div>
+
+    <div class="section-lbl">Typ umowy i produkt</div>
+    <div class="dim-row"><div class="dim-label">Typ umowy</div><div class="dim-tags">
+      <span class="tag tag-contract">Enterprise (wykluczenie)</span>
+      <span class="tag tag-contract">eCommerce</span>
+    </div></div>
+    <div class="dim-row"><div class="dim-label">Linia produktu</div><div class="dim-tags">
+      <span class="tag tag-product">TFF</span>
+      <span class="tag tag-product">TFC</span>
+      <span class="tag tag-product">TFS</span>
+    </div></div>
+
+    <div class="section-lbl">Aktywność i kontekst</div>
+    <div class="dim-row"><div class="dim-label">Aktywność</div><div class="dim-tags">
+      <span class="tag tag-other">Explorer (&lt;30 dni)</span>
+      <span class="tag tag-other">Aktywny (loguje się)</span>
+      <span class="tag tag-other">Nieaktywny (&gt;30–90 dni)</span>
+      <span class="tag tag-other">W onboardingu (Nexus)</span>
+    </div></div>
+    <div class="dim-row"><div class="dim-label">Inne</div><div class="dim-tags">
+      <span class="tag tag-other">Kraj</span>
+      <span class="tag tag-other">Data rejestracji firmy</span>
+      <span class="tag tag-other">Wielkość firmy (TFC)</span>
+      <span class="tag tag-other">Nie zablokowany</span>
+    </div></div>
+
+    <div class="section-lbl">Eventy lifecycle (Appcues / HubSpot)</div>
+    <div class="dim-row"><div class="dim-label">Eventy</div><div class="dim-tags">
+      <span class="tag tag-lc">first_login (web/mobile)</span>
+      <span class="tag tag-lc">is_authorised</span>
+      <span class="tag tag-lc">has_fx / subscribed</span>
+      <span class="tag tag-lc">dni od ost. transakcji</span>
+    </div></div>
+  </div>
+
+  <div class="panel" id="tab-builder">
+    <div class="section-lbl">Wybierz kryteria — system wykryje sprzeczności</div>
+
+    <div class="dim-row"><div class="dim-label">Cykl życia</div><div class="dim-tags">
+      <span class="tag tag-lc" id="b-nonsub" onclick="toggleB(this,'nonsub')">Non sub</span>
+      <span class="tag tag-lc" id="b-trial" onclick="toggleB(this,'trial')">Trial</span>
+      <span class="tag tag-lc" id="b-potrial" onclick="toggleB(this,'potrial')">Po-trial</span>
+      <span class="tag tag-lc" id="b-active" onclick="toggleB(this,'active')">Aktywny klient</span>
+      <span class="tag tag-lc" id="b-exabo" onclick="toggleB(this,'exabo')">Ex-abo</span>
+    </div></div>
+    <div class="dim-row"><div class="dim-label">Autoryzacja</div><div class="dim-tags">
+      <span class="tag tag-auth" id="b-auth" onclick="toggleB(this,'auth')">Authorized</span>
+      <span class="tag tag-auth" id="b-unauth" onclick="toggleB(this,'unauth')">Unauthorized</span>
+      <span class="tag tag-auth" id="b-deauth" onclick="toggleB(this,'deauth')">Deauthorized</span>
+    </div></div>
+    <div class="dim-row"><div class="dim-label">Typ umowy</div><div class="dim-tags">
+      <span class="tag tag-contract" id="b-ent" onclick="toggleB(this,'ent')">Enterprise</span>
+      <span class="tag tag-contract" id="b-ecom" onclick="toggleB(this,'ecom')">eCommerce</span>
+    </div></div>
+    <div class="dim-row"><div class="dim-label">Aktywność</div><div class="dim-tags">
+      <span class="tag tag-other" id="b-explorer" onclick="toggleB(this,'explorer')">Explorer (&lt;30 dni)</span>
+      <span class="tag tag-other" id="b-inactive" onclick="toggleB(this,'inactive')">Nieaktywny</span>
+      <span class="tag tag-other" id="b-onboard" onclick="toggleB(this,'onboard')">W onboardingu</span>
+    </div></div>
+    <div class="dim-row"><div class="dim-label">Perspektywa</div><div class="dim-tags">
+      <span class="tag tag-entity" id="b-user" onclick="toggleB(this,'user')">User</span>
+      <span class="tag tag-entity" id="b-company" onclick="toggleB(this,'company')">Company</span>
+    </div></div>
+
+    <div class="result-box" id="builder-result">Nie wybrano kryteriów. Wybierz powyżej.</div>
+  </div>
+</div>
+
+<script>
+const phaseData = [
+  {
+    title: 'Przed rejestracją — MQL / anonimowy',
+    who: 'Brak danych w CRM. Anonimowy user_id z narzędzi reklamowych.',
+    segments: [
+      {label:'Problem awareness', cls:'pill-gray'},
+      {label:'Solution awareness', cls:'pill-gray'},
+      {label:'SQL (sprzedażowy)', cls:'pill-gray'},
+    ],
+    access: 'Brak konta. Platforma zbiera anonimowe dane behawioralne (ślad po kliknięciu reklamy, wizycie na stronie, pobraniu PDF).',
+    owner: 'Ecommerce / Marketing (kampanie płatne, remarketing)',
+    excl: 'Nie są w żadnej bazie produktowej.',
+    warn: 'Dane w: HubSpot (mail jeśli zostawiony), Facebook/Google Ads (anonimowe). Nie ma jeszcze company_id ani user_id platformy.',
+    tools: ['HubSpot (zgody)','Facebook Ads','Google Ads'],
+  },
+  {
+    title: 'Rejestracja → pierwsze logowanie',
+    who: 'Użytkownik wypełnił formularz, ma konto, nie zalogował się jeszcze na platformę.',
+    segments: [
+      {label:'non_sub + unauthorized', cls:'pill-blue'},
+      {label:'new_registration', cls:'pill-blue'},
+    ],
+    access: 'Brak dostępu do platformy. Oczekuje na pierwszą sesję. Język narzucony przez ustawienia przeglądarki (wpływa na HubSpot i platformę).',
+    owner: 'Lifecycle communication',
+    excl: 'Wyklucz Enterprise (osobna ścieżka). Wyklucz zablokowanych.',
+    warn: 'Ważne: język rejestracji = język maili w HubSpot = język platformy przy 1. logowaniu. Zaproszenie od istniejącej firmy narzuca język zapraszającego.',
+    tools: ['HubSpot','Appcues (nie dotyczy — jeszcze nie zalogowany)'],
+  },
+  {
+    title: 'Pierwsze logowanie → zakup / trial',
+    who: 'Użytkownik zalogowany, może być na Demo lub od razu na Trial (autoverification = AAA path).',
+    segments: [
+      {label:'Demo → Trial', cls:'pill-purple'},
+      {label:'Auto-auth → Trial', cls:'pill-purple'},
+      {label:'Explorer (<30 dni)', cls:'pill-purple'},
+      {label:'Non sub authorized', cls:'pill-blue'},
+    ],
+    access: 'Demo: ograniczone funkcje, cel = przejście na Trial. Trial: pełny dostęp (jak płacący), cel = zakup. Cykl: demo→trial→demo może trwać 2 tygodnie–miesiąc. Trial może być przedłużany przez konsultantów.',
+    owner: 'Lifecycle communication (in-product, Appcues)',
+    excl: 'Wyklucz Explorer z komunikatów o nowościach. Wyklucz w onboardingu Nexus/Partners z kampanii ecom. Wyklucz Enterprise.',
+    warn: 'Segment nieautoryzowanych (manual verification) — osobna sekwencja Lifecycle, nie może wpaść do onboardingu aktywnych klientów.',
+    tools: ['Appcues (in-product)','HubSpot (mail)'],
+  },
+  {
+    title: 'Zakup → AHA moment (onboarding & activation)',
+    who: 'Klient po zakupie lub w trakcie aktywnego trialu. Cel: doprowadzić do AHA momentu.',
+    segments: [
+      {label:'Active customer', cls:'pill-amber'},
+      {label:'Trial (w trakcie)', cls:'pill-amber'},
+      {label:'Nowy user w istniejącej firmie', cls:'pill-amber'},
+    ],
+    access: 'Pełny dostęp (trial lub płatna). Mini AHA momenty: dodanie kontrahentów, wysłanie wiadomości, komunikacja poza giełdą. Duży AHA moment = pierwsza transakcja formalna.',
+    owner: 'Lifecycle + Product Marketing (wspólnie)',
+    excl: 'Wyklucz Explorer z komunikatów o nowościach. Planowana sekwencja mailowa dla trialowców (CLM). Wyklucz Enterprise z kampanii ecom.',
+    warn: 'Praca z Łukaszem Szymczykiem: definicja transakcji formalnych i liczba eventów potrzebnych do uznania AHA momentu za osiągnięty.',
+    tools: ['Appcues (in-product)','HubSpot (mail — planowane)','Snowflake (eventy)'],
+  },
+  {
+    title: 'Aktywacja → adopcja (sekwencja eventów per segment)',
+    who: 'Klient, który osiągnął AHA moment. Cel: habit building, rutynowe korzystanie.',
+    segments: [
+      {label:'Aktywny klient (TFF)', cls:'pill-green'},
+      {label:'Aktywny klient (TFC)', cls:'pill-green'},
+      {label:'Aktywny klient (TFS)', cls:'pill-green'},
+      {label:'Aktywny + zalogowany', cls:'pill-green'},
+    ],
+    access: 'Pełny dostęp. Wskaźnik: czas od ostatniej transakcji formalnej. Ryzyko churnu: >3 dni lub >tydzień bez transakcji.',
+    owner: 'Product Marketing + Lifecycle',
+    excl: 'Segment per linia produktu (TFF/TFC/TFS). Dla TFC: dodatkowo wielkość firmy (small/medium/large). Wyklucz nieaktywnych z małych newsfeedów. Wyklucz Enterprise jeśli osobna ścieżka.',
+    warn: 'Do adopcji wchodzi ten sam klient co w onboardingu — rozróżnienie to powtórzenie tych samych działań N razy i nabranie rutyny.',
+    tools: ['Appcues (in-product)','HubSpot (kampanie)','Snowflake (transakcje)'],
+  },
+  {
+    title: 'Adopcja — retention, renewal & expansion',
+    who: 'Długoterminowy aktywny klient. Cykl subskrypcji miesięcznej = powtarzalna decyzja odnowienia.',
+    segments: [
+      {label:'Aktywny klient', cls:'pill-green'},
+      {label:'Aktywny + zalogowany w N dni', cls:'pill-green'},
+      {label:'Expansion (nowe funkcje)', cls:'pill-teal'},
+    ],
+    access: 'Pełny dostęp. Po 4 miesiącach nieaktywności CX wraca do kontaktu (renewal perspective).',
+    owner: 'Ecommerce / CX + Product Marketing',
+    excl: 'Wyklucz zablokowanych. Wyklucz nieaktywnych z komunikatów o nowościach.',
+    warn: 'Renewal jest procesem cyklicznym (flywheel). Subskrypcja miesięczna = co miesiąc klient podejmuje decyzję. Ważne: nie traktuj jak jednorazowy etap.',
+    tools: ['HubSpot','Appcues','CX (direct outreach)'],
+  },
+  {
+    title: 'Churned — ex-abo / po-trial',
+    who: 'Były klient lub użytkownik po trialu bez zakupu. Może mieć dostęp do innych funkcji poza giełdą.',
+    segments: [
+      {label:'Ex-abo', cls:'pill-coral'},
+      {label:'Po-trial (wrócił na demo)', cls:'pill-coral'},
+      {label:'Non sub (nigdy nie kupił)', cls:'pill-gray'},
+    ],
+    access: 'Ex-abo: brak aktywnej umowy na giełdę, możliwy dostęp do innych funkcji. Po-trial: wraca na demo. Non sub: demo od początku.',
+    owner: 'Ecommerce / CX',
+    excl: 'Ex-abo może mieć współpracowników (użytkownik uprawniony + inni). Non sub ma zazwyczaj tylko uprawnionego.',
+    warn: 'Non sub ≠ ex-abo: non sub nigdy nie kupił, ex-abo był klientem. Różne ścieżki reaktywacyjne.',
+    tools: ['HubSpot (reaktywacja)','CX (telefon, WhatsApp)'],
+  },
+];
+
+let activePhase = 0;
+function selectPhase(i) {
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.phase')[i].classList.add('active');
+  activePhase = i;
+  renderDetail(phaseData[i]);
+}
+
+function renderDetail(d) {
+  const segs = d.segments.map(s => `<span class="pill ${s.cls}">${s.label}</span>`).join('');
+  const tools = d.tools.map(t => `<span class="pill pill-gray">${t}</span>`).join('');
+  document.getElementById('phase-detail').innerHTML = `
+    <div class="detail-title">${d.title}</div>
+    <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:8px;">${d.who}</div>
+    <div class="detail-grid">
+      <div class="detail-cell">
+        <div class="cell-label">Segmenty</div>
+        <div class="cell-content">${segs}</div>
+      </div>
+      <div class="detail-cell">
+        <div class="cell-label">Poziom dostępu</div>
+        <div class="cell-content" style="font-size:11px;">${d.access}</div>
+      </div>
+      <div class="detail-cell">
+        <div class="cell-label">Właściciel komunikacji</div>
+        <div class="cell-content" style="font-size:11px;">${d.owner}</div>
+      </div>
+      <div class="detail-cell">
+        <div class="cell-label">Wykluczenia</div>
+        <div class="cell-content" style="font-size:11px;">${d.excl}</div>
+      </div>
+    </div>
+    <div style="margin-top:8px;"><span class="warn">${d.warn}</span></div>
+    <div style="margin-top:8px;">${tools}</div>
+  `;
+}
+
+function switchTab(name) {
+  ['lifecycle','dims','builder'].forEach((t,i) => {
+    document.querySelectorAll('.tab')[i].classList.toggle('active', t === name);
+    document.getElementById('tab-'+t).classList.toggle('active', t === name);
+  });
+}
+
+const bSel = new Set();
+function toggleB(el, k) {
+  bSel.has(k) ? (bSel.delete(k), el.classList.remove('selected')) : (bSel.add(k), el.classList.add('selected'));
+  updateBuilder();
+}
+
+function updateBuilder() {
+  const s = bSel;
+  const notes = [];
+  if (!s.size) { document.getElementById('builder-result').textContent = 'Nie wybrano kryteriów. Wybierz powyżej.'; return; }
+
+  if (s.has('nonsub') && s.has('active')) notes.push('✗ Non sub i Aktywny klient wzajemnie się wykluczają — non sub nigdy nie miał zakupu.');
+  if (s.has('exabo') && s.has('active')) notes.push('✗ Ex-abo i Aktywny klient wzajemnie się wykluczają.');
+  if (s.has('potrial') && s.has('active')) notes.push('✗ Po-trial i Aktywny klient wzajemnie się wykluczają — po-trial stracił dostęp.');
+  if (s.has('ent') && s.has('ecom')) notes.push('✗ Enterprise i eCommerce to wzajemne wykluczenie — klient ma jeden typ umowy.');
+  if (s.has('auth') && s.has('unauth')) notes.push('✗ Authorized i Unauthorized jednocześnie — niemożliwe.');
+  if (s.has('deauth') && s.has('auth')) notes.push('✗ Deauthorized i Authorized jednocześnie — niemożliwe.');
+  if (s.has('nonsub') && s.has('auth')) notes.push('⚠ Non sub zweryfikowany (authorized) — to możliwe, ale upewnij się, że to twoja intencja. Non sub w definicji ecom jest już poza ścieżką po rejestracji.');
+  if (s.has('ent')) notes.push('⚠ Enterprise — zazwyczaj używany jako WYKLUCZENIE w kampaniach ecom, nie jako target. Czy to celowe?');
+  if (s.has('explorer') && s.has('inactive')) notes.push('✗ Explorer (<30 dni) i Nieaktywny (>30–90 dni) wzajemnie się wykluczają.');
+  if (s.has('trial') && s.has('nonsub')) notes.push('⚠ Trial i Non sub: trial to stan dostępu (pełny), non sub to stan cyklu życia (bez zakupu). Łączenie możliwe, ale sprawdź: non sub może być na trialu przed pierwszym zakupem.');
+  if (s.has('onboard') && s.has('ecom')) notes.push('⚠ W onboardingu (Nexus/Partners) + ecom: standardowo wyklucz tych w onboardingu z kampanii ecom growth.');
+  if (s.has('explorer')) notes.push('ℹ Explorer (<30 dni): nie wysyłaj komunikatów o nowościach — cała platforma jest dla nich nowa. Obejmij buforem onboardingowym.');
+  if (s.has('inactive') && s.has('active')) notes.push('⚠ Nieaktywny + Aktywny klient: "aktywny" może oznaczać aktywną umowę (klient), a "nieaktywny" brak logowania — to możliwa kombinacja do reaktywacji.');
+  if (s.has('nonsub') && s.has('company')) notes.push('ℹ Non sub + Company: non sub zazwyczaj ma jednego użytkownika uprawnionego. Perspektywa user ≈ company.');
+  if (!notes.length) notes.push('✓ Kombinacja wygląda poprawnie. Pamiętaj o standardowym wykluczeniu: zablokowanych (autoblokada) i Enterprise (jeśli kampania ecom).');
+
+  document.getElementById('builder-result').innerHTML = notes.map(n => `<div style="margin-bottom:5px">${n}</div>`).join('');
+}
+
+renderDetail(phaseData[0]);
+</script>
